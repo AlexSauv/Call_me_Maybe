@@ -7,7 +7,7 @@ install:
 	uv sync
 
 run:
-	uv run python -m src
+	uv run python -m src $(ARGS)
 
 lint:
 	uv run $(FLK) .

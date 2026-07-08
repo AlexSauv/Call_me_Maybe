@@ -1,18 +1,32 @@
 # from llm_sdk.llm_sdk import Small_LLM_Model
 from src.models import JsonFile
+import argparse
 # import numpy as np
-import sys
+
+
+def set_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input",
+                        type=str,
+                        default="data/input/function_calling_tests.json")
+    parser.add_argument("--functions_definition",
+                        type=str,
+                        default="data/input/functions_definition.json")
+    parser.add_argument("--output",
+                        type=str,
+                        default="data/output/function_calls.json")
+    return parser.parse_args()
 
 
 def main() -> None:
     try:
-        # model = Small_LLM_Model()
-        input_file = "data/input/function_calling_tests.json"
-        func_file = "data/input/functions_definition.json"
-        config = JsonFile(file_input=input_file, file_func=func_file)
-        config.load_json_files(input_file, func_file)
-        # else:
-        #     raise ValueError("Not the right number of arguments")
+        args = set_args()
+        args_input = args.input
+        args_func = args.functions_definition
+        config = JsonFile(file_input=args_input, file_func=args_func)
+        all_inputs, all_func = config.load_json_files()
+        print(all_inputs)
+
     except Exception as e:
         print(f"[ERROR] {e}")
 
