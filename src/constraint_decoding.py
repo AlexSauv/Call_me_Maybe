@@ -2,18 +2,34 @@ from llm_sdk.llm_sdk import Small_LLM_Model
 import json
 
 
-def load_vocab_map():
-    model = Small_LLM_Model()
-    vocab_lib = model.get_path_to_vocab_file()
-    with open(vocab_lib, 'r', encoding='utf-8') as f:
-        vocab = json.load(f)
-    id_to_token = {token_id: token for token, token_id in vocab.items()}
-    return id_to_token
 
-def contraint_decoding(prompt: str):
-    vocab = load_vocab_map()
-    model = Small_LLM_Model()
-    prompt_id = model.decode(prompt)
-    while True:
-        logits = model.get_logits_from_input_ids(prompt_id)
-        
+class ConstrainedDecoder:
+    def __init__(self, vocab_file: str) -> None:
+        self.vocab_file = vocab_file
+        self.token_to_id: dict[str, int] = {}
+        self.id_to_token: dict[int, str] = {}
+        self._load_vocab()
+
+    def _load_vocab(self):
+        with open(self.vocab_file, 'r', encoding='utf-8') as f:
+            vocab = json.load(f)
+        for token_str, token_id in vocab.items():
+            self.token_to_id[token_str] = int(token_id)
+            self.id_to_token[int(token_id)] = token_str
+
+    def get_token_ids(self, text: str) -> list[int]:
+        token_ids = []
+        for token_str, token_id in self.token_to_id.items():
+            token = token_str.lstrip("Ġ").lstrip(" ")
+            if token == text or token_str == text:
+                token_ids.append(token_id)
+            return token_ids
+
+    def apply_scoring(self, logits: list[float], id_tokens: set[int]) -> list[float]:
+        score_logits = list(logits)
+        if not id_tokens:
+            return score_logits
+        for i in range(len(score_logits)):
+            if i not in id_tokens:
+                score_logits[i] = float("-inf")
+        return score_logits

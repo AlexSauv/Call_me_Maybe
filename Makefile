@@ -1,13 +1,20 @@
 MYPY=mypy
 FLK=flake8
 
-.PHONY: run install lint lint-strict
+.PHONY: run install lint lint-strict debug clean
 
 install:
 	uv sync
 
 run:
 	uv run python -m src $(ARGS)
+
+debug:
+	uv run python -m pdb -m src
+
+clean:
+	rm -rf __pycache__ .mypy_cache .pytest_cache
+	find . -type d -name "__pycache__" -exec rm -rf {} +
 
 lint:
 	uv run $(FLK) .

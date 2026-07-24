@@ -1,7 +1,7 @@
-# from llm_sdk.llm_sdk import Small_LLM_Model
+from llm_sdk.llm_sdk import Small_LLM_Model
+from src.constraint_decoding import ConstrainedDecoder
 from src.models import JsonFile
 import argparse
-from src.constraint_decoding import load_vocab_map
 
 
 def set_args() -> argparse.Namespace:
@@ -20,13 +20,15 @@ def set_args() -> argparse.Namespace:
 
 def main() -> None:
     try:
+        model = Small_LLM_Model()
+        vocab_lib = model.get_path_to_vocab_file()
+        decoder = ConstrainedDecoder(vocab_lib)
         args = set_args()
         args_input = args.input
         args_func = args.functions_definition
         config = JsonFile(file_input=args_input, file_func=args_func)
         all_inputs, all_func = config.load_json_files()
         print(all_inputs)
-        load_vocab_map()
 
     except Exception as e:
         print(f"[ERROR] {e}")
