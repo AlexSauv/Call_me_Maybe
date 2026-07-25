@@ -2,6 +2,9 @@ from llm_sdk.llm_sdk import Small_LLM_Model
 from src.constraint_decoding import ConstrainedDecoder
 from src.models import JsonFile
 import argparse
+import json
+from pathlib import Path
+from src.call_me import generate_call_me
 
 
 def set_args() -> argparse.Namespace:
@@ -20,15 +23,24 @@ def set_args() -> argparse.Namespace:
 
 def main() -> None:
     try:
-        model = Small_LLM_Model()
-        vocab_lib = model.get_path_to_vocab_file()
-        decoder = ConstrainedDecoder(vocab_lib)
         args = set_args()
         args_input = args.input
         args_func = args.functions_definition
-        config = JsonFile(file_input=args_input, file_func=args_func)
+        config = JsonFile(file_input=args_input,
+                          file_func=args_func)
         all_inputs, all_func = config.load_json_files()
-        print(all_inputs)
+        model = Small_LLM_Model()
+        vocab_lib = model.get_path_to_vocab_file()
+        decoder = ConstrainedDecoder(vocab_lib)
+        result = []
+        for item in all_inputs:
+            prompt = str(item.get("prompt", ""))
+            res = generate_call_me(model, decoder, prompt, all_func)
+            result.append(res)
+        output = Path(args.output)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        with open(output, "w") as f:
+            json.dump(result, f, indent=2)
 
     except Exception as e:
         print(f"[ERROR] {e}")
