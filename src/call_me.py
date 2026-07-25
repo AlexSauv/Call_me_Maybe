@@ -43,7 +43,8 @@ def get_parameters(prompt: str,
     param_details = func_def.get("parameters", {})
     params: dict[str, Any] = {}
     num = re.findall(r"[-+]?\d*\.\d+|\d+", prompt)
-    string = re.findall(r"'([^']*)'|\"([^\"]*)\"", prompt)
+    strings = re.findall(r"'([^']*)'|\"([^\"]*)\"", prompt)
+    string = [s[0] or s[1] for s in strings if s[0] or s[1]]
     num_index = 0
     str_index = 0
     for param_name, param_info in param_details.items():

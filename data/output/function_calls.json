@@ -33,20 +33,14 @@
     "prompt": "Reverse the string 'hello'",
     "name": "fn_reverse_string",
     "parameters": {
-      "s": [
-        "hello",
-        ""
-      ]
+      "s": "hello"
     }
   },
   {
     "prompt": "Reverse the string 'world'",
     "name": "fn_reverse_string",
     "parameters": {
-      "s": [
-        "world",
-        ""
-      ]
+      "s": "world"
     }
   },
   {
@@ -67,10 +61,7 @@
     "prompt": "Replace all numbers in \"Hello 34 I'm 233 years old\" with NUMBERS",
     "name": "fn_substitute_string_with_regex",
     "parameters": {
-      "source_string": [
-        "",
-        "Hello 34 I'm 233 years old"
-      ],
+      "source_string": "Hello 34 I'm 233 years old",
       "regex": "Replace all numbers in \"Hello 34 I'm 233 years old\" with NUMBERS",
       "replacement": "Replace all numbers in \"Hello 34 I'm 233 years old\" with NUMBERS"
     }
@@ -79,10 +70,7 @@
     "prompt": "Replace all vowels in 'Programming is fun' with asterisks",
     "name": "fn_substitute_string_with_regex",
     "parameters": {
-      "source_string": [
-        "Programming is fun",
-        ""
-      ],
+      "source_string": "Programming is fun",
       "regex": "Replace all vowels in 'Programming is fun' with asterisks",
       "replacement": "Replace all vowels in 'Programming is fun' with asterisks"
     }
@@ -91,18 +79,9 @@
     "prompt": "Substitute the word 'cat' with 'dog' in 'The cat sat on the mat with another cat'",
     "name": "fn_substitute_string_with_regex",
     "parameters": {
-      "source_string": [
-        "cat",
-        ""
-      ],
-      "regex": [
-        "dog",
-        ""
-      ],
-      "replacement": [
-        "The cat sat on the mat with another cat",
-        ""
-      ]
+      "source_string": "cat",
+      "regex": "dog",
+      "replacement": "The cat sat on the mat with another cat"
     }
   }
 ]
