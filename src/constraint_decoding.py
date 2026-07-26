@@ -19,12 +19,21 @@ class ConstrainedDecoder:
     def get_allowed_tokens(self, text: str, functions: list) -> set[int]:
 
         allowed_ids: set[int] = set()
-        if '"name":' in text and text.count('"name":') == text.count('""'):
+
+        if "Target Function Name:" in text:
+            generated = text.split("Target Function Name:")[-1].lstrip()
+
             for func in functions:
-                func_name = func.name if hasattr(func, "name") else func["name"]
-                for token, token_id in self.token_to_id.items():
-                    if func_name.startswith(token.strip(' Ġ')):
-                        allowed_ids.add(token_id)
+                func_name = func.name if hasattr(func, "name") else func.get("name", "")
+
+                if func_name.startswith(generated):
+                    for token, token_id in self.token_to_id.items():
+                        clean_token = token.strip(' Ġ')
+                        if not clean_token:
+                            continue
+                        candidate = generated + clean_token
+                        if func_name.startswith(candidate) or candidate == func_name:
+                            allowed_ids.add(token_id)
         if not allowed_ids:
             return set(self.id_to_token.keys())
 

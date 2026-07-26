@@ -25,26 +25,23 @@
   },
   {
     "prompt": "Greet john",
-    "name": "fn_add_numbers",
+    "name": "fn_greet",
     "parameters": {
-      "a": 0,
-      "b": 0
+      "name": "Greet john"
     }
   },
   {
     "prompt": "Reverse the string 'hello'",
-    "name": "fn_add_numbers",
+    "name": "fn_reverse_string",
     "parameters": {
-      "a": 0,
-      "b": 0
+      "s": "Reverse the string 'hello'"
     }
   },
   {
     "prompt": "Reverse the string 'world'",
-    "name": "fn_add_numbers",
+    "name": "fn_reverse_string",
     "parameters": {
-      "a": 0,
-      "b": 0
+      "s": "Reverse the string 'world'"
     }
   },
   {

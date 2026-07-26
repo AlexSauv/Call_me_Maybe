@@ -12,9 +12,7 @@ def get_func(model: Small_LLM_Model,
         raise ValueError("[FUNC] No data for functions")
     new_prompt = f"Instruction: {prompt}\nTarget Function Name:"
     input_ids = model.encode(new_prompt)[0].tolist()
-    found = False
-    result = functions[0]
-    for _ in range(100):
+    for _ in range(30):
 
         logits = model.get_logits_from_input_ids(input_ids)
 
@@ -26,13 +24,21 @@ def get_func(model: Small_LLM_Model,
                                 key=lambda i: cleaned_logits[i]))
         input_ids.append(next_token_id)
 
+        curr_output = model.decode(input_ids)
+        generate = curr_output.split("Target Function Name:")[-1].strip().strip('"\'')
+        if any(func.name == generate for func in functions):
+            break
         decode_token = model.decode([next_token_id])
-        if '\n' in decode_token:
+        if "\n" in decode_token and len(generate) > 0:
             break
     final_output_text = model.decode(input_ids)
     clean_name = final_output_text.split("Target Function Name:")[-1].strip().strip('"\'')
+    clean_name = clean_name.replace(" ", "_")
     for func in functions:
         if clean_name == func.name:
+            return func
+    for func in functions:
+        if func.name in clean_name or clean_name in func.name:
             return func
     return functions[0]
 
