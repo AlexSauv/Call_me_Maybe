@@ -8,6 +8,12 @@ class FuncParam(BaseModel):
     type: str
 
 
+class FuncResult(BaseModel):
+    prompt: str
+    name: str
+    parameters: dict[str, Any]
+
+
 class FuncDef(BaseModel):
     name: str = Field(default="")
     description: str = Field(default="")
@@ -25,10 +31,10 @@ class JsonFile(BaseModel):
 
     def load_json_files(self) -> tuple[list[dict[str, Any]],
                                        list[dict[str, Any]]]:
-        with open(self.file_input, 'r') as f:
-            input_data = json.load(f)
-        with open(self.file_func, 'r') as f:
-            func_data = json.load(f)
+        with open(self.file_input, 'r', encoding='utf-8') as f:
+            input_data = [PromptInput(**item) for item in json.load(f)]
+        with open(self.file_func, 'r', encoding='utf-8') as f:
+            func_data = [FuncDef(**func) for func in json.load(f)]
         return input_data, func_data
 
     @model_validator(mode="after")

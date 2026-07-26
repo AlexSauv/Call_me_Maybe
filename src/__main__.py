@@ -26,21 +26,24 @@ def main() -> None:
         args = set_args()
         args_input = args.input
         args_func = args.functions_definition
+
         config = JsonFile(file_input=args_input,
                           file_func=args_func)
         all_inputs, all_func = config.load_json_files()
+
         model = Small_LLM_Model()
         vocab_lib = model.get_path_to_vocab_file()
         decoder = ConstrainedDecoder(vocab_lib)
+
         result = []
         for item in all_inputs:
-            prompt = str(item.get("prompt", ""))
-            res = generate_call_me(model, decoder, prompt, all_func)
+            res = generate_call_me(model, decoder, item, all_func)
             result.append(res)
         output = Path(args.output)
         output.parent.mkdir(parents=True, exist_ok=True)
-        with open(output, "w") as f:
-            json.dump(result, f, indent=2)
+
+        with open(output, "w", encoding="utf-8") as f:
+            json.dump([res.model_dump() for res in result], f, indent=2)
 
     except Exception as e:
         print(f"[ERROR] {e}")

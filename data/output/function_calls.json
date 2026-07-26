@@ -4,7 +4,7 @@
     "name": "fn_add_numbers",
     "parameters": {
       "a": 2,
-      "b": 3
+      "b": 2
     }
   },
   {
@@ -12,76 +12,79 @@
     "name": "fn_add_numbers",
     "parameters": {
       "a": 265,
-      "b": 345
+      "b": 265
     }
   },
   {
     "prompt": "Greet shrek",
-    "name": "fn_greet",
+    "name": "fn_add_numbers",
     "parameters": {
-      "name": "Greet shrek"
+      "a": 0,
+      "b": 0
     }
   },
   {
     "prompt": "Greet john",
-    "name": "fn_greet",
+    "name": "fn_add_numbers",
     "parameters": {
-      "name": "Greet john"
+      "a": 0,
+      "b": 0
     }
   },
   {
     "prompt": "Reverse the string 'hello'",
-    "name": "fn_reverse_string",
+    "name": "fn_add_numbers",
     "parameters": {
-      "s": "hello"
+      "a": 0,
+      "b": 0
     }
   },
   {
     "prompt": "Reverse the string 'world'",
-    "name": "fn_reverse_string",
+    "name": "fn_add_numbers",
     "parameters": {
-      "s": "world"
+      "a": 0,
+      "b": 0
     }
   },
   {
     "prompt": "What is the square root of 16?",
-    "name": "fn_get_square_root",
+    "name": "fn_add_numbers",
     "parameters": {
-      "a": 16
+      "a": 0,
+      "b": 0
     }
   },
   {
     "prompt": "Calculate the square root of 144",
-    "name": "fn_get_square_root",
+    "name": "fn_add_numbers",
     "parameters": {
-      "a": 144
+      "a": 144,
+      "b": 144
     }
   },
   {
     "prompt": "Replace all numbers in \"Hello 34 I'm 233 years old\" with NUMBERS",
-    "name": "fn_substitute_string_with_regex",
+    "name": "fn_add_numbers",
     "parameters": {
-      "source_string": "Hello 34 I'm 233 years old",
-      "regex": "Replace all numbers in \"Hello 34 I'm 233 years old\" with NUMBERS",
-      "replacement": "Replace all numbers in \"Hello 34 I'm 233 years old\" with NUMBERS"
+      "a": 34,
+      "b": 34
     }
   },
   {
     "prompt": "Replace all vowels in 'Programming is fun' with asterisks",
-    "name": "fn_substitute_string_with_regex",
+    "name": "fn_add_numbers",
     "parameters": {
-      "source_string": "Programming is fun",
-      "regex": "Replace all vowels in 'Programming is fun' with asterisks",
-      "replacement": "Replace all vowels in 'Programming is fun' with asterisks"
+      "a": 0,
+      "b": 0
     }
   },
   {
     "prompt": "Substitute the word 'cat' with 'dog' in 'The cat sat on the mat with another cat'",
-    "name": "fn_substitute_string_with_regex",
+    "name": "fn_add_numbers",
     "parameters": {
-      "source_string": "cat",
-      "regex": "dog",
-      "replacement": "The cat sat on the mat with another cat"
+      "a": 0,
+      "b": 0
     }
   }
 ]
