@@ -4,7 +4,7 @@ from src.models import JsonFile
 import argparse
 import json
 from pathlib import Path
-from src.call_me import generate_call_me
+from src.call_me_maybe import generate_call_me
 
 
 def set_args() -> argparse.Namespace:

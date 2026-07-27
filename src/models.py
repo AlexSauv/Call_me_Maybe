@@ -1,8 +1,15 @@
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, ValidationError
 from typing import Any, Self
 import json
 import os
 
+def parse_and_validate_output(raw_generation: str, model_class: type[BaseModel]) -> dict:
+    try:
+        data = json.loads(raw_generation)
+        validated_data = model_class(**data)
+        return validated_data.model_dump()
+    except (json.JSONDecodeError, ValidationError) as e:
+        raise ValueError(f"Failed to parse LLM output: {e}")
 
 class FuncParam(BaseModel):
     type: str
