@@ -1,7 +1,20 @@
-from pydantic import BaseModel, Field, model_validator, ValidationError
+from pydantic import BaseModel, Field, model_validator, ValidationError, field_validator
 from typing import Any, Self
 import json
 import os
+
+VALID_TYPES = ['string', 'number', 'integer', 'boolean', 'null']
+
+
+class FieldType(BaseModel):
+    type: str
+
+    @field_validator("type", mode="after")
+    def type_checker(cls, value: str) -> str:
+        if value not in VALID_TYPES:
+            raise ValueError(f"[TYPE] {value} type not found.")
+        return value
+
 
 def parse_and_validate_output(raw_generation: str, model_class: type[BaseModel]) -> dict:
     try:
@@ -10,9 +23,6 @@ def parse_and_validate_output(raw_generation: str, model_class: type[BaseModel])
         return validated_data.model_dump()
     except (json.JSONDecodeError, ValidationError) as e:
         raise ValueError(f"Failed to parse LLM output: {e}")
-
-class FuncParam(BaseModel):
-    type: str
 
 
 class FuncResult(BaseModel):
@@ -24,8 +34,8 @@ class FuncResult(BaseModel):
 class FuncDef(BaseModel):
     name: str = Field(default="")
     description: str = Field(default="")
-    parameters: dict[str, FuncParam]
-    returns: dict[str, str]
+    parameters: dict[str, FieldType]
+    returns: FieldType
 
 
 class PromptInput(BaseModel):

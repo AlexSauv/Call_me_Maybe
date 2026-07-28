@@ -41,14 +41,13 @@ def select_func(model: Small_LLM_Model,
 
         logits = model.get_logits_from_input_ids(input_ids)
 
-        decode_text = model.decode(input_ids)
+        # decode_text = model.decode(input_ids)
 
-        allowed_token_ids = decoder.get_allowed_tokens(decode_text, functions)
+        allowed_token_ids = decoder.get_allowed_tokens(new_prompt, functions)
 
         cleaned_logits = decoder.apply_scoring(logits, allowed_token_ids)
 
-        next_token_id = int(max(range(len(cleaned_logits)),
-                                key=lambda i: cleaned_logits[i]))
+        next_token_id = int(np.argmax(cleaned_logits))
         input_ids.append(next_token_id)
 
         curr_output = model.decode(input_ids)
@@ -80,7 +79,7 @@ def select_param(model: Small_LLM_Model,
     encoded_tensor = model.encode(new_prompt)
     input_ids = encoded_tensor[0].tolist()
 
-    for _ in range(30):
+    for _ in range(60):
         logits = model.get_logits_from_input_ids(input_ids)
         decode_text = model.decode(input_ids)
 
@@ -90,10 +89,10 @@ def select_param(model: Small_LLM_Model,
         next_token_id = int(np.argmax(cleaned_logits))
         input_ids.append(next_token_id)
 
-        curr_output = model.decode(input_ids)
-        print(curr_output)
-        # if "}" in curr_output.split("Output JSON parameters:")[-1]:
-        #     break
+        current_output = model.decode(input_ids).split("Output JSON parameters:")[-1]
+        if "}" in current_output:
+            break
+
     final_output_text = model.decode(input_ids)
     raw_json_str = final_output_text.split("Output JSON parameters:")[-1].strip()
     try:
@@ -105,36 +104,6 @@ def select_param(model: Small_LLM_Model,
     except json.JSONDecodeError:
         pass
     return {}
-
-    # param_details = func_def.parameters
-    # params: dict[str, Any] = {}
-    # num_found = 0
-    # str_found = 0
-
-    # for param_name, param_info in param_details.items():
-    #     param_type = getattr(param_info, "type", "string")
-    #     if isinstance(param_info, dict):
-    #         param_type = param_info.get("type", "string")
-
-    #     if param_type in ["number", "float", "integer"]:
-    #         num = find_all_numbers(user_prompt)
-    #         if num:
-    #             if num_found < len(num):
-    #                 params[param_name] = num[num_found]
-    #                 num_found += 1
-    #         else:
-    #             raise ValueError("[PARAM] parameter data not found")
-    #     elif param_type in ["string", "regex"]:
-    #         strings = find_all_strings(user_prompt)
-    #         if str_found < len(strings):
-    #             params[param_name] = strings[str_found]
-    #             str_found += 1
-    #         else:
-    #             params[param_name] = user_prompt
-    #     elif param_type == "boolean":
-    #         params[param_name] = "true" in user_prompt.lower()
-
-    # return params
 
 
 def generate_call_me(model: Small_LLM_Model,
