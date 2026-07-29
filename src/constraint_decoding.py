@@ -28,31 +28,29 @@ class ConstrainedDecoder:
                     allowed_ids.add(token_id)
 
         if not allowed_ids:
-            return set(self.id_to_token.keys())
+            raise ValueError("[CONSTRAINT] No token ids allowed.")
         return allowed_ids
 
-    def allowed_tokens_param(self, user_prompt: str,
+    def allowed_tokens_param(self, curr_output: str,
                              func: FuncDef) -> set[int]:
         allowed_ids: set[int] = set()
 
-        curr_output = user_prompt.split("Output JSON parameters:")[-1]
+    def _check_param_key(self,
+                         curr_output: str,
+                         curr_token: str,
+                         func: FuncDef):
+        clean_token = curr_token.strip(' Ġ')
+        stripped_output = curr_output.strip()
+        if stripped_output.endswith("{"):
+            return curr_token == '"' or curr_token in [' ', ' Ġ']
 
-        for token, token_id in self.token_to_id.items():
-            if self._is_token_valid_for_schema(curr_output, token, func):
-                allowed_ids.add(token_id)
-
-        if not allowed_ids:
-            return set(self.id_to_token.keys())
-        return allowed_ids
-
-    def _is_token_valid_for_schema(self, current_text: str, token_str: str, func: FuncDef) -> bool:
-        clean_token = token_str.strip(' Ġ')
-        if not current_text.strip():
-            return "{" in clean_token or clean_token == ""
-        valid_chars = "{}[\"]\",:0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-. "
-        if any(c in valid_chars for c in clean_token):
-            return True
-            
+        if stripped_output.count('"') % 2 != 0 and not stripped_output.endswith(":"):
+            valid_keys = func.parameters.keys()
+            for key in valid_keys:
+                if (clean_token in key
+                        or key.startswith(clean_token)
+                        or clean_token == '"'):
+                    return True
         return False
 
     def apply_scoring(self, logits: list[float],
@@ -64,18 +62,3 @@ class ConstrainedDecoder:
             if i not in allowed_id:
                 score_logits[i] = float("-inf")
         return score_logits
-
-
-
-
-
-
-# def get_allowed_tokens(self, current_text: str, schema_definition: dict) -> set[int]:
-#     allowed_ids = set()
-#     for token_id, token_str in self.id_to_token.items():
-#         if self._is_token_valid_for_schema(current_text, token_str, schema_definition):
-#             allowed_ids.add(token_id)
-            
-#     if not allowed_ids:
-#         return set(self.id_to_token.keys())
-#     return allowed_ids

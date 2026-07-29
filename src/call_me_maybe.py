@@ -89,8 +89,9 @@ def select_param(model: Small_LLM_Model,
         next_token_id = int(np.argmax(cleaned_logits))
         input_ids.append(next_token_id)
 
-        current_output = model.decode(input_ids).split("Output JSON parameters:")[-1]
-        if "}" in current_output:
+        curr_output = model.decode(input_ids).split("Output JSON parameters:")[-1]
+        print(curr_output)
+        if "}" in curr_output:
             break
 
     final_output_text = model.decode(input_ids)
