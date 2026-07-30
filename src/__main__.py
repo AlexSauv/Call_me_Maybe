@@ -4,7 +4,7 @@ from src.models import JsonFile
 import argparse
 import json
 from pathlib import Path
-from src.call_me_maybe import generate_call_me
+from src.call_me_maybe import select_func, select_params, select_prompt
 
 
 def set_args() -> argparse.Namespace:
@@ -37,13 +37,17 @@ def main() -> None:
 
         result = []
         for item in all_inputs:
-            res = generate_call_me(model, decoder, item, all_func)
-            result.append(res)
+            new_prompt = select_prompt(all_func, item)
+            encoded_tensor = model.encode(new_prompt)
+            input_ids = encoded_tensor[0].tolist()
+            func = select_func(model, decoder, input_ids, all_func)
+            params = select_params(model, decoder, input_ids, func)
+            print(f"Final result for func name: {func}, params : {params}")
         output = Path(args.output)
         output.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(output, "w", encoding="utf-8") as f:
-            json.dump([res.model_dump() for res in result], f, indent=2)
+        # with open(output, "w", encoding="utf-8") as f:
+        #     json.dump([res for res in result], f, indent=2)
 
     except Exception as e:
         print(f"[ERROR] {e}")

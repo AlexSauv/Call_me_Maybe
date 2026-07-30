@@ -16,49 +16,23 @@ class ConstrainedDecoder:
             self.token_to_id[token_str] = int(token_id)
             self.id_to_token[int(token_id)] = token_str
 
-
-    def get_allowed_tokens(self, user_prompt, functions: list[FuncDef]) -> set[int]:
+    def get_allowed_tokens(self, generate_data: str, valid_tokens: list[str]) -> set[int]:
         allowed_ids: set[int] = set()
-
-        for func in functions:
-            for token, token_id in self.token_to_id.items():
-                clean_token = token.strip(' Ġ')
-                if (func.name.startswith(clean_token)
-                        or clean_token in user_prompt):
+        for token, token_id in self.token_to_id.items():
+            next_prob = generate_data + token
+            for valid_token in valid_tokens:
+                if valid_token.startswith(next_prob):
                     allowed_ids.add(token_id)
-
+                    break
         if not allowed_ids:
             raise ValueError("[CONSTRAINT] No token ids allowed.")
         return allowed_ids
 
-    def allowed_tokens_param(self, curr_output: str,
-                             func: FuncDef) -> set[int]:
-        allowed_ids: set[int] = set()
-
-    def _check_param_key(self,
-                         curr_output: str,
-                         curr_token: str,
-                         func: FuncDef):
-        clean_token = curr_token.strip(' Ġ')
-        stripped_output = curr_output.strip()
-        if stripped_output.endswith("{"):
-            return curr_token == '"' or curr_token in [' ', ' Ġ']
-
-        if stripped_output.count('"') % 2 != 0 and not stripped_output.endswith(":"):
-            valid_keys = func.parameters.keys()
-            for key in valid_keys:
-                if (clean_token in key
-                        or key.startswith(clean_token)
-                        or clean_token == '"'):
-                    return True
-        return False
-
     def apply_scoring(self, logits: list[float],
                       allowed_id: set[int]) -> list[float]:
-        score_logits = list(logits)
+        masked_logits = [float('-inf')] * len(logits)
         if not allowed_id:
-            return score_logits
-        for i in range(len(score_logits)):
-            if i not in allowed_id:
-                score_logits[i] = float("-inf")
-        return score_logits
+            return logits
+        for i in allowed_id:
+            masked_logits[i] = logits[i]
+        return masked_logits
