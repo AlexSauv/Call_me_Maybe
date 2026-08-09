@@ -1,5 +1,6 @@
 import json
 from src.models import FuncDef
+import numpy as np
 
 
 class ConstrainedDecoder:
@@ -13,8 +14,9 @@ class ConstrainedDecoder:
         with open(self.vocab_file, 'r', encoding='utf-8') as f:
             vocab = json.load(f)
         for token_str, token_id in vocab.items():
-            self.token_to_id[token_str] = int(token_id)
-            self.id_to_token[int(token_id)] = token_str
+            tok_id = int(token_id)
+            self.token_to_id[token_str] = tok_id
+            self.id_to_token[tok_id] = token_str
 
     def get_allowed_tokens(self, generate_data: str, valid_tokens: list[str]) -> set[int]:
         allowed_ids: set[int] = set()
@@ -29,10 +31,12 @@ class ConstrainedDecoder:
         return allowed_ids
 
     def apply_scoring(self, logits: list[float],
-                      allowed_id: set[int]) -> list[float]:
-        masked_logits = [float('-inf')] * len(logits)
-        if not allowed_id:
+                      allowed_ids: set[int]) -> list[float]:
+        if not allowed_ids:
             return logits
-        for i in allowed_id:
-            masked_logits[i] = logits[i]
-        return masked_logits
+        masked_logits = np.full(len(logits), -float('inf'))
+        allowed = list(allowed_ids)
+        for token_id in allowed:
+            if 0 <= token_id < len(logits):
+                masked_logits[token_id] = logits[token_id]
+        return masked_logits.tolist()
