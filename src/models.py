@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, model_validator, ValidationError, field_validator
+from pydantic import BaseModel, Field, model_validator, field_validator
 from typing import Any, Self
 import json
 import os
@@ -16,6 +16,7 @@ class FieldType(BaseModel):
             raise ValueError(f"[TYPE] {value} type not found.")
         return value
 
+
 class FuncDef(BaseModel):
     """Model represnetation of a function """
     name: str = Field(default="")
@@ -23,11 +24,13 @@ class FuncDef(BaseModel):
     parameters: dict[str, FieldType]
     returns: FieldType
 
+
 class FuncResult(BaseModel):
     """Model representation of the expected output"""
     prompt: str
     name: str
     parameters: dict[str, Any]
+
 
 class PromptInput(BaseModel):
     """Model representing a single input prompt."""
@@ -58,5 +61,4 @@ class JsonFile(BaseModel):
                 func_data = [FuncDef(**func) for func in raw_funcs]
             return input_data, func_data
         except json.JSONDecodeError as e:
-                raise ValueError(f"[JSON] Invalid JSON format in input files: {e}")
-
+            raise ValueError(f"[JSON] Invalid JSON format in input files: {e}")

@@ -1,5 +1,4 @@
 import json
-from src.models import FuncDef
 import numpy as np
 
 
@@ -18,7 +17,8 @@ class ConstrainedDecoder:
             self.token_to_id[token_str] = tok_id
             self.id_to_token[tok_id] = token_str
 
-    def get_allowed_tokens(self, generate_data: str, valid_tokens: list[str]) -> set[int]:
+    def get_allowed_tokens(self, generate_data: str,
+                           valid_tokens: list[str]) -> set[int]:
         allowed_ids: set[int] = set()
         for token, token_id in self.token_to_id.items():
             next_prob = generate_data + token

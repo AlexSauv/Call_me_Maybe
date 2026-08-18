@@ -28,7 +28,8 @@ def main() -> None:
     try:
         args = set_args()
 
-        config = JsonFile(file_input=args.input, file_func=args.functions_definition)
+        config = JsonFile(file_input=args.input,
+                          file_func=args.functions_definition)
         all_inputs, all_func = config.load_json_files()
 
         model = Small_LLM_Model()
