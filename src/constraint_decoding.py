@@ -9,7 +9,7 @@ class ConstrainedDecoder:
         self.id_to_token: dict[int, str] = {}
         self._load_vocab()
 
-    def _load_vocab(self):
+    def _load_vocab(self) -> None:
         with open(self.vocab_file, 'r', encoding='utf-8') as f:
             vocab = json.load(f)
         for token_str, token_id in vocab.items():

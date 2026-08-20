@@ -1,0 +1,35 @@
+[
+  {
+    "name": "fn_complex_math",
+    "description": "Perform advanced calculations with extreme values or decimals.",
+    "parameters": {
+      "base_value": {
+        "type": "number"
+      },
+      "multiplier": {
+        "type": "number"
+      },
+      "verbose": {
+        "type": "boolean"
+      }
+    },
+    "returns": {
+      "type": "number"
+    }
+  },
+  {
+    "name": "fn_process_text",
+    "description": "Process a text block with specific formatting options.",
+    "parameters": {
+      "raw_text": {
+        "type": "string"
+      },
+      "uppercase": {
+        "type": "boolean"
+      }
+    },
+    "returns": {
+      "type": "string"
+    }
+  }
+]

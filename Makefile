@@ -14,6 +14,7 @@ debug:
 
 clean:
 	rm -rf __pycache__ .mypy_cache .pytest_cache
+	rm -rf data/output
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 
 lint:

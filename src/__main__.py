@@ -4,12 +4,15 @@ import sys
 from pathlib import Path
 
 from llm_sdk.llm_sdk import Small_LLM_Model
-from src.call_me_maybe import select_func, select_params, select_prompt
+from src.call_me_maybe import gen_call_me_maybe
 from src.constraint_decoding import ConstrainedDecoder
-from src.models import FuncResult, JsonFile
+from src.models import JsonFile
 
 
 def set_args() -> argparse.Namespace:
+    """
+        parse arguments given for Json files
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--input",
                         type=str,
@@ -36,25 +39,7 @@ def main() -> None:
         vocab_lib = model.get_path_to_vocab_file()
         decoder = ConstrainedDecoder(vocab_lib)
 
-        results: list[dict] = []
-
-        for item in all_inputs:
-            prompt_str = item.prompt
-            prompt_text = select_prompt(all_func, prompt_str)
-
-            encoded_tensor = model.encode(prompt_text)
-            input_ids = encoded_tensor[0].tolist()
-
-            func_def = select_func(model, decoder, input_ids, all_func)
-            params = select_params(model, decoder, input_ids, func_def)
-
-            func_res = FuncResult(
-                prompt=prompt_str,
-                name=func_def.name,
-                parameters=params
-            )
-            results.append(func_res.model_dump())
-            print(f"[OK] Prompt: '{prompt_str}' -> {func_def.name}({params})")
+        results = gen_call_me_maybe(model, decoder, all_inputs, all_func)
 
         output_path = Path(args.output)
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -62,7 +47,8 @@ def main() -> None:
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(results, f, indent=2, ensure_ascii=False)
 
-        print(f"\n[SUCCESS] Saved {len(results)} function calls to {output_path}")
+        print(f"\n[SUCCESS] Saved {len(results)} "
+              f"function calls to {output_path}")
 
     except Exception as e:
         print(f"[ERROR] Execution failed: {e}", file=sys.stderr)

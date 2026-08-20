@@ -2,7 +2,7 @@ from typing import Any
 import numpy as np
 from llm_sdk.llm_sdk import Small_LLM_Model
 from src.constraint_decoding import ConstrainedDecoder
-from src.models import FuncDef
+from src.models import FuncDef, PromptInput, FuncResult
 
 
 def append_text_tokens(model: Small_LLM_Model,
@@ -145,7 +145,7 @@ def select_string_params(
 def select_number_params(model: Small_LLM_Model,
                          decoder: ConstrainedDecoder,
                          input_ids: list[int],
-                         is_float: bool = True
+                         is_float: bool
                          ) -> float | int:
     """
         Generates digits based on user prompt
@@ -157,19 +157,43 @@ def select_number_params(model: Small_LLM_Model,
     high_num_prob = ""
     valid_chars = set("0123456789.-" if is_float else set("0123456789-"))
 
+    user_prompt = model.decode(input_ids)
+    if "-" in user_prompt:
+        neg_num = True
+    else:
+        neg_num = False
+
     while True:
         logits = model.get_logits_from_input_ids(input_ids)
 
         allowed_ids = set()
         for tok, tid in decoder.token_to_id.items():
             clean_tok = clean_token_text(tok).strip()
-            if clean_tok and all(c in valid_chars for c in clean_tok):
-                prob = high_num_prob + clean_tok
-                if (prob in ("-", ".")
-                        or prob.replace(".", "",
-                                        1).replace("-", "",
-                                                   1).isdigit()):
-                    allowed_ids.add(tid)
+            if not clean_tok:
+                continue
+
+            prob = high_num_prob + clean_tok
+            is_valid = False
+
+            if is_float:
+                try:
+                    float(prob)
+                    is_valid = True
+                except ValueError:
+                    if prob in ("-", ".", "-."):
+                        is_valid = True
+            else:
+                if prob == "-" or (prob.lstrip("-").isdigit()
+                                   and prob.count("-") <= 1
+                                   and (prob.find("-") == 0
+                                        or "-" not in prob)):
+                    is_valid = True
+
+            if is_valid and all(c in valid_chars for c in clean_tok):
+                if neg_num and high_num_prob == "":
+                    if "-" in clean_tok:
+                        allowed_ids.add(tid)
+                allowed_ids.add(tid)
 
         if not allowed_ids:
             break
@@ -218,7 +242,7 @@ def select_params(
         p_type = param_info.type
 
         if p_type == "string":
-            val = select_string_params(model, decoder, input_ids)
+            val: Any = select_string_params(model, decoder, input_ids)
         elif p_type == "number":
             val = select_number_params(model, decoder,
                                        input_ids, is_float=True)
@@ -244,16 +268,29 @@ def select_params(
     append_text_tokens(model, input_ids, "}}")
     return params_result
 
-# def generate_call_me(model: Small_LLM_Model,
-#                      decoder: ConstrainedDecoder,
-#                      user_text: PromptInput,
-#                      functions: list[dict[str, Any]]
-#                      ) -> FuncResult:
-#     prompt = (user_text.prompt if hasattr(user_text,
-#                                           "prompt") else str(user_text))
-#     func = select_func(model, decoder,, functions)
-#     func_name = func.name
 
-#     # params = select_params(model, decoder, prompt, func)
+def gen_call_me_maybe(model: Small_LLM_Model,
+                      decoder: ConstrainedDecoder,
+                      user_inputs: list[PromptInput],
+                      functions: list[FuncDef]
+                      ) -> list[dict[str, Any]]:
+    results: list[dict[str, Any]] = []
+    for item in user_inputs:
+        prompt_str = item.prompt
+        prompt_text = select_prompt(functions, prompt_str)
 
-#     return FuncResult(prompt=prompt, name=func_name, parameters=params)
+        encoded_tensor = model.encode(prompt_text)
+        input_ids = encoded_tensor[0].tolist()
+
+        func_def = select_func(model, decoder, input_ids, functions)
+        params = select_params(model, decoder, input_ids, func_def)
+
+        try:
+            func_res = FuncResult(
+                prompt=prompt_str,
+                name=func_def.name,
+                parameters=params)
+        except Exception:
+            raise Exception(f"[RESULT] There is an issue with {func_res}")
+        results.append(func_res.model_dump())
+    return results
