@@ -1,8 +1,15 @@
-from typing import Any
-import numpy as np
-from llm_sdk.llm_sdk import Small_LLM_Model
-from src.constraint_decoding import ConstrainedDecoder
-from src.models import FuncDef, PromptInput, FuncResult
+import sys
+import time
+try:
+    from typing import Any
+    import numpy as np
+    from llm_sdk.llm_sdk import Small_LLM_Model
+    from src.constraint_decoding import ConstrainedDecoder
+    from src.models import FuncDef, PromptInput, FuncResult
+except KeyboardInterrupt:
+    print("The program is closing")
+    time.sleep(1)
+    sys.exit(1)
 
 
 def append_text_tokens(model: Small_LLM_Model,
@@ -39,7 +46,7 @@ def select_prompt(functions: list[FuncDef], user_prompt: str) -> str:
 
     return (
         f"You are a precise function-calling assistant. "
-        f"Extract literal values and positive patterns"
+        f"Extract correct values and patterns"
         " directly from the user prompt.\n\n"
         f"Available Functions:\n"
         f"{tools_formatted}\n\n"
@@ -157,12 +164,6 @@ def select_number_params(model: Small_LLM_Model,
     high_num_prob = ""
     valid_chars = set("0123456789.-" if is_float else set("0123456789-"))
 
-    user_prompt = model.decode(input_ids)
-    if "-" in user_prompt:
-        neg_num = True
-    else:
-        neg_num = False
-
     while True:
         logits = model.get_logits_from_input_ids(input_ids)
 
@@ -175,22 +176,13 @@ def select_number_params(model: Small_LLM_Model,
             prob = high_num_prob + clean_tok
             is_valid = False
 
-            if is_float:
-                try:
-                    float(prob)
-                    is_valid = True
-                except ValueError:
-                    if prob in ("-", ".", "-."):
-                        is_valid = True
-            else:
-                if prob == "-" or (prob.lstrip("-").isdigit()
-                                   and prob.count("-") <= 1
-                                   and (prob.find("-") == 0
-                                        or "-" not in prob)):
-                    is_valid = True
+            if ("-" in prob and prob.lstrip("-").isdigit()
+                and prob.count("-") <= 1
+                    and prob.find("-") == 0) or "-" not in prob:
+                is_valid = True
 
             if is_valid and all(c in valid_chars for c in clean_tok):
-                if neg_num and high_num_prob == "":
+                if high_num_prob == "":
                     if "-" in clean_tok:
                         allowed_ids.add(tid)
                 allowed_ids.add(tid)

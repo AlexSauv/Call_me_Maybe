@@ -1,12 +1,18 @@
-import argparse
-import json
 import sys
-from pathlib import Path
+import time
+try:
+    import argparse
+    import json
+    from pathlib import Path
 
-from llm_sdk.llm_sdk import Small_LLM_Model
-from src.call_me_maybe import gen_call_me_maybe
-from src.constraint_decoding import ConstrainedDecoder
-from src.models import JsonFile
+    from llm_sdk.llm_sdk import Small_LLM_Model
+    from src.call_me_maybe import gen_call_me_maybe
+    from src.constraint_decoding import ConstrainedDecoder
+    from src.models import JsonFile
+except KeyboardInterrupt:
+    print("The program is closing")
+    time.sleep(1)
+    sys.exit(1)
 
 
 def set_args() -> argparse.Namespace:
@@ -46,9 +52,6 @@ def main() -> None:
 
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(results, f, indent=2, ensure_ascii=False)
-
-        print(f"\n[SUCCESS] Saved {len(results)} "
-              f"function calls to {output_path}")
 
     except Exception as e:
         print(f"[ERROR] Execution failed: {e}", file=sys.stderr)
