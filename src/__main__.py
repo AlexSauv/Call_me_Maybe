@@ -1,5 +1,4 @@
 import sys
-import time
 try:
     import argparse
     import json
@@ -11,7 +10,6 @@ try:
     from src.models import JsonFile
 except KeyboardInterrupt:
     print("The program is closing")
-    time.sleep(1)
     sys.exit(1)
 
 
@@ -28,7 +26,7 @@ def set_args() -> argparse.Namespace:
                         default="data/input/functions_definition.json")
     parser.add_argument("--output",
                         type=str,
-                        default="data/output/function_calls.json")
+                        default="data/output/function_calling_results.json")
     return parser.parse_args()
 
 

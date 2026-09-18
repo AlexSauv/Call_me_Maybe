@@ -23,4 +23,4 @@ lint:
 
 lint-strict:
 	uv run $(FLK) .
-	uv run  $(MYPY) --strict . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+	uv run  $(MYPY) . --strict --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
