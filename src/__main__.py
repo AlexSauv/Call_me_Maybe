@@ -7,8 +7,11 @@ try:
     from src.call_me_maybe import call_me_maybe
     from src.constraint_decoding import ConstrainedDecoder
     from src.models import JsonFile
-except KeyboardInterrupt:
-    print("The program is closing")
+except KeyboardInterrupt as e:
+    print(f"The program has been closed")
+    sys.exit(1)
+except ImportError as e:
+    print(f"[ERROR][IMPORT] {e}")
     sys.exit(1)
 
 
