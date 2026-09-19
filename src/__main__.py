@@ -8,7 +8,7 @@ try:
     from src.constraint_decoding import ConstrainedDecoder
     from src.models import JsonFile
 except KeyboardInterrupt as e:
-    print(f"The program has been closed")
+    print(f"The program has been closed: {e}")
     sys.exit(1)
 except ImportError as e:
     print(f"[ERROR][IMPORT] {e}")
