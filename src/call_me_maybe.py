@@ -261,11 +261,11 @@ def select_params(
     return params_result
 
 
-def gen_call_me_maybe(model: Small_LLM_Model,
-                      decoder: ConstrainedDecoder,
-                      user_inputs: list[PromptInput],
-                      functions: list[FuncDef]
-                      ) -> list[dict[str, Any]]:
+def call_me_maybe(model: Small_LLM_Model,
+                  decoder: ConstrainedDecoder,
+                  user_inputs: list[PromptInput],
+                  functions: list[FuncDef]
+                  ) -> list[dict[str, Any]]:
     results: list[dict[str, Any]] = []
     for item in user_inputs:
         prompt_str = item.prompt

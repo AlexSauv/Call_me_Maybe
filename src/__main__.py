@@ -4,7 +4,7 @@ try:
     import json
     from pathlib import Path
     from llm_sdk import Small_LLM_Model  # type: ignore
-    from src.call_me_maybe import gen_call_me_maybe
+    from src.call_me_maybe import call_me_maybe
     from src.constraint_decoding import ConstrainedDecoder
     from src.models import JsonFile
 except KeyboardInterrupt:
@@ -42,7 +42,7 @@ def main() -> None:
         vocab_lib = model.get_path_to_vocab_file()
         decoder = ConstrainedDecoder(vocab_lib)
 
-        results = gen_call_me_maybe(model, decoder, all_inputs, all_func)
+        results = call_me_maybe(model, decoder, all_inputs, all_func)
 
         output_path = Path(args.output)
         output_path.parent.mkdir(parents=True, exist_ok=True)
