@@ -3,8 +3,7 @@ try:
     import argparse
     import json
     from pathlib import Path
-
-    from llm_sdk.llm_sdk import Small_LLM_Model
+    from llm_sdk import Small_LLM_Model  # type: ignore
     from src.call_me_maybe import gen_call_me_maybe
     from src.constraint_decoding import ConstrainedDecoder
     from src.models import JsonFile

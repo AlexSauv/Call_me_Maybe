@@ -3,7 +3,7 @@ import time
 try:
     from typing import Any
     import numpy as np
-    from llm_sdk.llm_sdk import Small_LLM_Model
+    from llm_sdk import Small_LLM_Model  # type: ignore
     from src.constraint_decoding import ConstrainedDecoder
     from src.models import FuncDef, PromptInput, FuncResult
 except KeyboardInterrupt:
