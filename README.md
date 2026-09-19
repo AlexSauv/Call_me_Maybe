@@ -44,17 +44,19 @@ Edge-Case Handling: Tested with negative numbers, strings, and missing or malfor
 
 **INSTRUCTION**
 
-In order to run the program properly you nedd to to have all dependencies
+In order to run the program properly you need to have all dependencies
 
 Please use this command
 
 - Make install
+- uv sync
 
 In order to run the program use those commands:
 
 [WITH DEFAULT INPUTS]
 
 - Make run
+- uv run python -m src
 
 [WITH SPECIFIC ARGUMENTS]
 
@@ -77,7 +79,7 @@ uv run python -m src
 
 - https://medium.com/@adkananthi/logits-as-confidence-the-hidden-power-ai-engineers-need-to-unlock-in-llms-and-vlms-194d512c31f2
 
-IA used
+IA used:
 
 IA tools were used for rebuild a visual representation of the README and for deeper comprehensions of topics.
 
